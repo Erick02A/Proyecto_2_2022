@@ -4,7 +4,7 @@ import pygame           #música
 from threading import Thread 
 import threading
 
-End_game = lambda: exit()
+End_game = lambda: main_menu.destroy()
 stop_music = lambda: pygame.mixer.music.stop()
 
 def main_track():
@@ -20,44 +20,46 @@ def main_track():
     pygame.mixer.music.load("ShipStackMaintheme.mp3")
     pygame.mixer.music.play(loops=0)
 
-def main_screen(): 
+class main_screen: 
     """
-    En primera instancia este modulo mostrará la interfaz del menú principal.
+    En primera instancia esta clase soporta todo lo relacionado a pantallas,
+    créditos y puntajes.
     End_game es una función lambda utilizada para terminar la ejecución del
     programa.
     """
-    mainTrack= Thread(target=main_track,args=())
-    mainTrack.start() #comando para ejecutar sonido con hilos
+    def __init__(self,root):
+        self.root=root
+        self.main_canvas = tk.Canvas(root, width=900, height=700, bg="blue")
+        self.main_canvas.place(x=0,y=0)
+        self.pantalla_principal()
+    def pantalla_principal(self):
+        """
+        Aqui dentro van todos los widgets de la pantalla principal.
+        """
+        main_track()
+        #Se genera la barra de menu
+        self.options_bar = Menu(self.root)
+        self.root.config(menu=self.options_bar)
+        #Columna del menu
+        self.file_menu = Menu(self.options_bar)
+        self.options_bar.add_cascade(label="File", menu=self.file_menu)
+        self.file_menu.add_command(label="Nuevo...")
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Detener musica", command=stop_music)
+        self.file_menu.add_command(label="Salir", command=End_game)
+        #Columna del menu
+        self.edit_menu = Menu(self.options_bar)
+        self.options_bar.add_cascade(label="Edit", menu=self.edit_menu)
+        self.edit_menu.add_command(label="Nuevo...")
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(label="Detener musica", command=stop_music)
+        self.edit_menu.add_command(label="Salir", command=End_game)
     
-    main_menu = Tk()
-    main_menu.title("ShipStack")
-    main_menu.minsize(900,700)
-    main_menu.resizable(width=YES,height=YES)
+main_menu = Tk()
+ventana_principal = main_screen(main_menu)
+main_menu.title("ShipStack")
+main_menu.minsize(900,700)
+main_menu.resizable(width=YES,height=YES)
 
-    main_canvas = tk.Canvas(main_menu, width=900, height=700, bg="blue")
-    main_canvas.place(x=0,y=0)
-
-    def our_command():
-        print("works")
-    #Se genera la barra de menu
-    options_bar = Menu(main_menu)
-    main_menu.config(menu=options_bar)
-    #Columna del menu
-    file_menu = Menu(options_bar)
-    options_bar.add_cascade(label="File", menu=file_menu)
-    file_menu.add_command(label="Nuevo...",command=our_command)
-    file_menu.add_separator()
-    file_menu.add_command(label="Detener musica", command=stop_music)
-    file_menu.add_command(label="Salir", command=End_game)
-    #Columna del menu
-    edit_menu = Menu(options_bar)
-    options_bar.add_cascade(label="Edit", menu=edit_menu)
-    edit_menu.add_command(label="Nuevo...",command=our_command)
-    edit_menu.add_separator()
-    edit_menu.add_command(label="Detener musica", command=stop_music)
-    edit_menu.add_command(label="Salir", command=End_game)
-
-    main_menu.mainloop() #usado para tkinter
-main_menu_thread= Thread(target = main_screen, args=())
-main_menu_thread.start()
+main_menu.mainloop() #usado para tkinter
     
