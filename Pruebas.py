@@ -1,10 +1,14 @@
 from tkinter import *           #importar todo de tkinter
-import tkinter as tk
-from turtle import width            #llamar a la libreria como tk
+import tkinter as tk            #llamar a la libreria como tk
 import pygame                   #música
 from threading import Thread    #hilos 
 import threading                #hilos
-import os       
+import os    
+from random import *
+
+vidas=0
+
+
 
 
 class game:
