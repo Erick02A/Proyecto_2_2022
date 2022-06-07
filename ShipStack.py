@@ -4,6 +4,7 @@ import pygame                   #música
 from threading import Thread    #hilos 
 import threading                #hilos
 import os                       #carga de imagenes
+from Pruebas import *
 
 def main_track():
     """
@@ -133,10 +134,14 @@ class main_screen:
         self.help_menu.add_separator()
         self.help_menu.add_command(label="DETENER MUSICA", command=stop_music)
         self.help_menu.add_command(label="SALIR DEL JUEGO", command=End_game)
+
+        startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'))
+        startGame.place(x=500,y=500)
         
 main_menu = Tk()
 pantalla_principal = main_screen(main_menu) #se cambió la palabra ventana por pantalla, parece funcionar igual
 main_menu.title("SHIPSTACK")
+main_menu.config(cursor="target")
 main_menu.minsize(700,600)
-main_menu.resizable(width=YES,height=YES)
+main_menu.resizable(width=NO,height=NO)
 main_menu.mainloop() #usado para tkinter
