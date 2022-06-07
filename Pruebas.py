@@ -24,16 +24,20 @@ class game:
         self.canvas_player.place(x=751,y=0)
         self.bottlist_enemy=[]
         self.bottlist_player=[]
+        def verifica(self,i,j):
+            self.bottlist_enemy[i][j].config(bg="#FF0000")
         for i in range(0,10):
             self.bottlist_enemy.append([])
             for j in range(0,10):
-                self.bottlist_enemy[i].append(Button(self.canvas_enemi,bg="#15E4E9"))
+                self.bottlist_enemy[i].append(Button(self.canvas_enemi,bg="#15E4E9",command= lambda: verifica(i,j)))
                 self.bottlist_enemy[i][j].place(relx=0.1*j,rely=0.1*i,relwidth=0.1,relheight=0.1)
         for i in range(0,10):
             self.bottlist_player.append([])
             for j in range(0,10):
                 self.bottlist_player[i].append(Button(self.canvas_player,bg="#7553F1"))
                 self.bottlist_player[i][j].place(relx=0.1*j,rely=0.1*i,relwidth=0.1,relheight=0.1)
+        
+
         
 
 main_menu = Tk()
