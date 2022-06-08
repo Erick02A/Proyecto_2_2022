@@ -6,6 +6,8 @@ import threading                #hilos
 import os                       #carga de imagenes
 from Pruebas import *
 
+puntaje=0
+
 def main_track():
     """
     Esta es la función para ejecutar el sonido con la bibloteca pygame.
@@ -19,6 +21,8 @@ def main_track():
     pygame.mixer.music.load("ShipStackMaintheme.mp3")
     pygame.mixer.music.play(loops=0)
 stop_music = lambda: pygame.mixer.music.stop()
+start_game = lambda: pantalla_game()
+
 
 def cargaimagen(nombre):
     """
@@ -60,6 +64,22 @@ class main_screen:
         self.Boton_instruccionesToMain = Button(self.canvas, text="VOLVER",font=("Times New Roman", 15),bg="#04faee",command=self.pantalla_principal)
         self.Boton_instruccionesToMain.place(x=350,y=520, width=80, height=30)
 
+    def requisitos(self):
+        """
+        Este metodo le indica al usuario mediante una etiqueta cómo ingresar al top 10.
+        """
+        self.canvas = Canvas(self.root, width=1200, height=700)
+        self.canvas.place(x=0, y=0)
+        self.imagen=cargaimagen("bg.png")
+        self.canvas.create_image(550,350, image=self.imagen)
+
+        self.texto = Label(self.canvas, text="¿CÓMO INGRESAR AL TOP 10?:\n*Juegue bien xd*", font=("Times New Roman", 15),fg="#000000",bg="#04faee")
+        self.texto.place(x=300,y=15)
+        #Botón para volver de la seccion  al menú
+        self.Boton_requisitosToMain = Button(self.canvas, text="VOLVER",font=("Times New Roman", 15),bg="#04faee",command=self.pantalla_principal)
+        self.Boton_requisitosToMain.place(x=350,y=520, width=80, height=30)
+
+
     def creditos(self):
         """
         Metodo que genera el canvas de la pantalla de Creditos con todos sun widgets
@@ -76,7 +96,7 @@ class main_screen:
         self.texto = Label(self.canvas, text="Instituto Tecnologico de Costa Rica\n"
                            "Ingeniería en Computadores\n"
                            "CE 1102-Taller de Programación\n"
-                           "Profesor: Jason Leitó Jiménez\n"
+                           "Profesor: Jason Leitón Jiménez\n"
                            "Versión 1.0\n"
                            "última modificación: 14/06/2022\n"
                            "Desarrolladores:\n", font=("Times New Roman", 15),fg="#000000",bg="#04faee")
@@ -113,7 +133,80 @@ class main_screen:
         self.main_canvas.place(x=0,y=0)
         self.main_bg = cargaimagen("bg(1).png")
         self.main_canvas.create_image(1,1,image=self.main_bg)
-        
+
+        def puntajes(): #parámetros : self
+            """
+            Metodo que genera el canvas de la pantalla de puntajes
+            Parametros: 
+                self: parametro que se usa para modificar cosas dentro de la clase
+            """
+            self.canvas= Canvas(self.root,width=1200,height=700,bg="#ffffff")
+            self.canvas.place(x=0, y=0)
+            #Se carga una imagen de fondo
+            """self.imagen=cargaimagen("Trofeo (1).png")
+            self.canvas.create_image(600,350, image=self.imagen)"""
+            # Lugar donde se mostrara el puntaje
+            self.score = Label(self.canvas, text="TOP 10: ", font=("Helvetica", 15), fg="#f55cdf", bg="#04faee")
+            self.score.place(x=580,y=30) 
+            # Boton para regresar ala pantalla principal
+            self.boton_back_punt = Button(self.canvas, text="Back",font=("Times New Roman", 18),bg="#04faee",command=self.pantalla_principal)
+            self.boton_back_punt.place(x=550,y=520, width=80, height=30)
+            #funcion que habre el archivo de puntajes y los guarda en una variable
+            def abrir_puntajes(): 
+                """
+                funcion que habre el archivo de puntajes y los guarda en una variable
+                Parametros: 
+                    Ninguno
+                return:
+                    no se retorna 
+                """
+                archivo= open("puntajes.txt") 
+                nombres = archivo.readlines() #guarda los nombres y puntajes en una variable
+                archivo.close() 
+                separar(nombres,[],[])#llama a la funcion para separar los nombres y puntajes
+            # Se inicia la funcion de puntajes en un hilo
+            top10 = Thread(target= abrir_puntajes) 
+            top10.start()
+            def separar(lista,nombre,puntos):
+                """
+                funcion que separa los nobres de los puntos
+                Parametros: 
+                    lista: variable con los nobres y sus puntajes
+                    nombre: variable que guarda los nombre
+                    puntos: Variable que guarda los puntos
+                return:
+                    no se retorna 
+                """
+                if lista==[]:
+                    h1=Thread(target=mostrar(nombre,350,50))
+                    h2=Thread(target=mostrar(puntos,450,50))
+                    h1.start()
+                    h2.start()
+                else:
+                    divisor=lista[0].split(";")
+                    nombre+=[divisor[0]]
+                    puntos+=[divisor[1]]
+                    separar(lista[1:],nombre,puntos)
+
+            def mostrar(nombres,x1,y1):
+                """
+                funcion que coloca cada nombre o cada puntaje en un label en el canvas de puntajes
+                Parametros: 
+                    x1: variable que va aumentando para generar otra coordenada en x
+                    nombre: variable con los nobres o puntos
+                    y1: variable que va aumentando para generar otra coordenada en y
+                return:
+                    no se retorna 
+                """
+                if nombres!=[]:
+                    self.info1= Label(self.canvas, text=nombres[0], font=("Helvetica", 15), fg="white", bg="black")
+                    self.info1.place(x=x1,y=y1)
+                    y1+=50
+                    mostrar(nombres[1:],x1,y1)
+
+        self.titulo = Label(self.main_canvas, text="SHIPSTACK", font=("Helvetica", 12), fg="#000000", bg="#04faee")
+        self.titulo.place(x=510,y=30,width=180, height=130)
+
         #Se genera la barra de menu
         self.options_bar = Menu(self.root)
         self.root.config(menu=self.options_bar)
@@ -125,7 +218,9 @@ class main_screen:
         #Columna del menu para acceder al salón de la fama
         self.fama_menu = Menu(self.options_bar)
         self.options_bar.add_cascade(label="SALÓN DE LA FAMA", menu=self.fama_menu)
-        self.fama_menu.add_command(label="Opción vacante")
+        self.fama_menu.add_command(label="TOP 10",command=puntajes)
+        self.fama_menu.add_command(label="¿CÓMO ENTRAR EN EL TOP 10?",command=self.requisitos)
+
         #Columna del menu para acceder a la seccion de ayudas
         self.help_menu = Menu(self.options_bar)
         self.options_bar.add_cascade(label="AYUDA", menu=self.help_menu)
@@ -135,13 +230,48 @@ class main_screen:
         self.help_menu.add_command(label="DETENER MUSICA", command=stop_music)
         self.help_menu.add_command(label="SALIR DEL JUEGO", command=End_game)
 
-        startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'))
+        startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'),command=start_game)
         startGame.place(x=500,y=500)
-        
+
+        def abrir_txt(self,persona,puntaje):#tiene como argumentos el nombre y puntaje del jugador que finalizo partida 
+            archivo= open("archivo.txt","r") 
+            nombres = archivo.readlines()#guarda los nombres y puntajes en una variable
+            archivo.close() 
+            self.comparador(nombres,"",persona,puntaje,0)#llama a la funcion que compara el puntaje con los del top 7 
+    
+        def comparador(self,lista, res , persona,puntaje,i):
+            if i == 7: #contador que verifica que se revise hasta el 7 lugar
+                return self.actualizar(res) 
+            divisor = lista[0].split(";")#separa el nombre del puntaje y los guarda en una lista
+            actualPunt = int(divisor[1])#obtiene el puntaje de la lista y lo convierte en entero
+            if actualPunt < puntaje: #compara si el puntaje obtenido es mayor a uno del top 7          
+                res += persona + ";" + str(puntaje)+ "\n"#guarda el nombre y puntaje del jugador en el string de resultado           
+                #usando el contador +1 se obtiene la posición que consiguió y se muestra en un label junto con el puntaje
+                self.posicion_obt.configure(text="Has obtenido la posición " + str(i+1)+" con un total de " + str(puntaje)+" puntos")
+                return self.comparador(lista,res,persona,0,i+1)#cambia el valor del puntaje a 0 para no reemplazar los demas puntajes menores
+            self.comparador(lista[1:],res+lista[0],persona,puntaje,i+1)#guarda los datos del top 7 cuando el puntaje del jugador no es superior a alguno de estos
+
+        #funcion que obtiene la variable con los datos del nuevo top 7 y actualiza el archivo de texto con estos    
+        def actualizar(self,nuevos):
+            archivo = open("puntajes.txt","w") 
+            archivo.write(nuevos) 
+            archivo.close()
+        #retorna a la pantalla principal y restablece los valores
+        def retorno(self):
+            global puntaje
+            global nombre
+            global segundos
+            puntaje=0 #restablece el puntaje
+            nombre="" #retablese el nombre
+            segundos=0 #restablece los segundos
+            self.main_canvas.destroy()
+            self.pantalla_principal()
+
+
 main_menu = Tk()
 pantalla_principal = main_screen(main_menu) #se cambió la palabra ventana por pantalla, parece funcionar igual
 main_menu.title("SHIPSTACK")
 main_menu.config(cursor="target")
-main_menu.minsize(700,600)
+main_menu.minsize(1000,600)
 main_menu.resizable(width=NO,height=NO)
 main_menu.mainloop() #usado para tkinter
