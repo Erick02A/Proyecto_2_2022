@@ -22,14 +22,20 @@ def cargaimagen(nombre):
 class game:
     def __init__(self,root):
         self.root=root
-        self.main_canvas = tk.Canvas(root,width=1200,height=600, bg="green") #1600,800
+        self.main_canvas = tk.Canvas(root,width=1300,height=600, bg="green") #1600,800
         self.main_canvas.place(x=0,y=0)
         self.pantalla_game()
     def pantalla_game(self):
         self.canvas_enemi = Canvas(self.root,width=600,height=600,bg="red")
         self.canvas_enemi.place(x=0,y=0)
         self.canvas_player = Canvas(self.root,width=600,height=600,bg="blue")
-        self.canvas_player.place(x=601,y=0)
+        self.canvas_player.place(x=701,y=0)
+        self.canvas_info=Canvas(self.root,width=100,height=600)
+        self.canvas_info.place(x=601,y=0)
+        self.segundos=0
+        self.min=0
+        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos),width=9,height=2,fg="black",bg="#b4b0f7")
+        self.mar_seg.place(x=0,y=0)
         self.espacio_enemy=generabarcos()        
         self.espacio_player=[
         [0,0,0,0,0,0,0,2,0,0],
@@ -43,6 +49,15 @@ class game:
         [0,0,2,0,2,0,0,2,0,0],
         [0,0,2,0,0,0,0,0,0,0]
         ]
+        def Cronometro():
+            if self.segundos==60:
+                self.segundos=0
+                self.min+=1
+            self.segundos+=1
+            self.mar_seg.config(text="Tiempo. "+str(self.min)+":"+str(self.segundos))
+            self.root.after(1000,Cronometro)
+        Hilo_crono=Thread(target=Cronometro())
+        Hilo_crono.start()
         def cuentabarcos(pant):
             cant=0
             for filas in pant:
@@ -143,6 +158,7 @@ class game:
                 actualiza_enemy()
         Click=Thread(target=self.canvas_enemi.bind("<Button-1>",Disparo))
         Click.start()
+        
 
 def generabarcos():
     pant=[
@@ -171,7 +187,7 @@ def generabarcos():
 main_menu = Tk()
 main_menu.title("SHIPSTACK")
 main_menu.config(cursor="pirate")
-main_menu.minsize(1200,600)#
+main_menu.minsize(1300,600)#
 main_menu.resizable(width=NO,height=NO)
 pantalla_principal = game(main_menu) #se cambió la palabra ventana por pantalla, parece funcionar igual
 main_menu.mainloop() #usado para tkinter
