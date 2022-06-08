@@ -3,10 +3,9 @@ import tkinter as tk            #llamar a la libreria como tk
 import pygame                   #pygame, por el momento para musica
 from threading import Thread    #hilos 
 import threading                #hilos
-import os    
+import os   
+import time 
 from random import *
-
-vidas=0
 
 def cargaimagen(nombre):
     """
@@ -31,47 +30,68 @@ class game:
         self.canvas_enemi.place(x=0,y=0)
         self.canvas_player = Canvas(self.root,width=600,height=600,bg="blue")
         self.canvas_player.place(x=601,y=0)
-        self.espacio_enemy=[
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0]
-        ]
-        
+        self.espacio_enemy=generabarcos()        
         self.espacio_player=[
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,2,0,0,0],
+        [0,0,0,0,0,0,2,0,0,0],
+        [0,0,0,0,0,0,2,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0]
         ]
-        #self.fondo00=self.canvas_enemi.create_rectangle(0,60,60,0,fill="#5555FF")
-        #self.fondo00=self.canvas_enemi.create_rectangle(60,120,100,60,fill="#5600FF")
+        def cuentabarcos(pant):
+            cant=0
+            for filas in pant:
+                for lugar in filas:
+                    if lugar==2:
+                        cant+=1
+            return cant
+        def actualiza_player():
+            for f in range(len(self.espacio_player)):
+                for c in range(len(self.espacio_player[0])):
+                    if self.espacio_player[f][c]==0:
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
+                    if self.espacio_player[f][c]==2:
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#0000FF")
+                    if self.espacio_player[f][c]==1:
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
+                    if self.espacio_player[f][c]==3:
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
+            if cuentabarcos(self.espacio_player)==0:
+                print("LOSER")
+                main_menu.destroy()
+        actualiza_player()
+        def disparo_enemy():
+            a=randint(0,9)
+            b=randint(0,9)
+            if self.espacio_player[b][a]!=1 and self.espacio_player[b][a]!=3:
+                self.espacio_player[b][a]+=1
+                actualiza_player()
+            else:
+                disparo_enemy()
+
         def actualiza_enemy():
             for f in range(len(self.espacio_enemy)):
                 for c in range(len(self.espacio_enemy[0])):
                     if self.espacio_enemy[f][c]==0:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
                     if self.espacio_enemy[f][c]==2:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#0000FF")
                     if self.espacio_enemy[f][c]==1:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
                     if self.espacio_enemy[f][c]==3:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
-
+            if cuentabarcos(self.espacio_enemy)==0:
+                print("WINER")
+                main_menu.destroy()
+            disparo_enemy()
         actualiza_enemy()
-        def mostrar(e):
+
+        def Disparo(e):
             def creaA(e):
                 if e.x<60:
                     a=0
@@ -120,10 +140,32 @@ class game:
             b=creaB(e)
             if self.espacio_enemy[b][a]!=1 and self.espacio_enemy[b][a]!=3:
                 self.espacio_enemy[b][a]+=1
-                print(self.espacio_enemy[b][a])
                 actualiza_enemy()
-        self.canvas_enemi.bind("<Button-1>",mostrar)
+        Click=Thread(target=self.canvas_enemi.bind("<Button-1>",Disparo))
+        Click.start()
 
+def generabarcos():
+    pant=[
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0]
+        ]
+    cant=randint(0,20)
+    for i in range(cant+1):
+        f=randint(0,9)
+        c=randint(0,9)
+        pant[f][c]=2
+    return pant
+            
+
+    
         
 
 main_menu = Tk()
