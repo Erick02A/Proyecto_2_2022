@@ -104,7 +104,7 @@ class game:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
             if cuentabarcos(self.espacio_enemy)==0:
                 print("WINER")
-                self.root.destroy()
+                self.juegoterminado(True)
             if self.pasa==False:
                 self.root.after(2000,disparo_enemy)
         actualiza_enemy()
@@ -372,7 +372,11 @@ class game:
         Click=Thread(target=self.canvas_enemi.bind("<Button-1>",Disparo))
         Click.start()
         """
-        
+    def juegoterminado(self,ganar):
+        if ganar==True:
+            ganar
+        self.root.destroy()
+        import ShipStack       
 def cuentabarcos(pant):
     cant=0
     for filas in pant:
