@@ -78,7 +78,7 @@ class game:
                         self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
             if cuentabarcos(self.espacio_player)==0:
                 print("LOSER")
-                
+                self.juegoterminado(False)
         actualiza_player()
         def disparo_enemy():
             a=randint(0,9)
