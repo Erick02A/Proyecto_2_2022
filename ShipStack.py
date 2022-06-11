@@ -5,7 +5,6 @@ from threading import Thread    #hilos
 import threading                #hilos
 import os                       #carga de imagenes
 from Juego import game
-
 def main_track():
     """
     Esta es la función para ejecutar el sonido con la bibloteca pygame.
@@ -225,7 +224,7 @@ class main_screen:
         self.help_menu.add_separator()
         self.help_menu.add_command(label="DETENER MUSICA", command=stop_music)
         self.help_menu.add_command(label="SALIR DEL JUEGO", command=End_game)
-
+                
         startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'),command=lambda:abrirjuego("Play"))
         startGame.place(x=500,y=500)
 
@@ -262,6 +261,8 @@ class main_screen:
             segundos=0 #restablece los segundos
             self.main_canvas.destroy()
             self.pantalla_principal()
+
+            
         def abrirjuego(forma):
             if self.player_name.get() != "":
                 main_menu.destroy()
