@@ -8,6 +8,11 @@ import time
 from random import *
 from tkinter import messagebox
 
+def boom():
+    pygame.mixer.init() 
+    pygame.mixer.music.load("boom.wav")
+    pygame.mixer.music.play(loops=0)
+
 def cargaimagen(nombre):
     """
     Funcion que cargas las imagenes usadas en el programa
@@ -21,8 +26,9 @@ def cargaimagen(nombre):
     return imagen
 
 class game:
-    def __init__(self,root,forma):
+    def __init__(self,root,forma,barcos):
         self.root=root
+        self.barcos=barcos #int()
         self.main_canvas = tk.Canvas(root,width=1300,height=600, bg="green") #1600,800
         self.main_canvas.place(x=0,y=0)
         if forma == "PlayB":
@@ -84,6 +90,10 @@ class game:
                 self.juegoterminado(False)
         actualiza_player()
         def disparo_enemy():
+            """
+            disparo_enemy
+            Selecciona un cuadro aleatorio y le dispara desde la posición del computador hacia el tablero del jugador
+            """
             a=randint(0,9)
             b=randint(0,9)
             if self.espacio_player[b][a]!=1 and self.espacio_player[b][a]!=3:
@@ -118,6 +128,7 @@ class game:
                 def creaA(e):
                     if e.x<counter:
                         a=0
+                        boom()
                     elif e.x<counter*2:
                         a=1
                     elif e.x<counter*3:
@@ -172,79 +183,54 @@ class game:
 
         Click=Thread(target=self.canvas_enemi.bind("<Button-1>",Disparo))
         Click.start()
-
+#############################################################################################################
     def pantalla_gameB(self):
         self.canvas_enemi = Canvas(self.root,width=600,height=600,bg="red")
         self.canvas_enemi.place(x=0,y=0)
-        self.canvas_player = Canvas(self.root,width=600,height=600,bg="blue")
-        self.canvas_player.place(x=701,y=0)
-        self.canvas_info=Canvas(self.root,width=100,height=600)
-        self.canvas_info.place(x=601,y=0)
-        self.espacio_enemy=generabarcos()        
-        self.espacio_player=[
+        #Se genera la barra de menu
+        self.options_bar = Menu(self.root)
+        self.root.config(menu=self.options_bar)
+        #Columna del menu para abrir una partida guardada
+        self.abrir_juego = Menu(self.options_bar)
+        self.options_bar.add_cascade(label="ABRIR JUEGO", menu=self.abrir_juego)
+        self.abrir_juego.add_command(label="Abrir partida guardada",command=lambda:seguirJuego("Play"))
+        self.abrir_juego.add_separator()
+        self.espacio_enemy=[
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,2,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0]
-        ]
+        ]   
         self.pasa=True #el turno es nuestro
-
-        def actualiza_player():
-            for f in range(len(self.espacio_player)):
-                for c in range(len(self.espacio_player[0])):
-                    if self.espacio_player[f][c]==0:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
-                    if self.espacio_player[f][c]==2:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#0000FF")
-                    if self.espacio_player[f][c]==1:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
-                    if self.espacio_player[f][c]==3:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
-            if cuentabarcos(self.espacio_player)==0:
-                print("LOSER")
-                self.juegoterminado(False)
-        actualiza_player()
-        def disparo_enemy():
-            a=randint(0,9)
-            b=randint(0,9)
-            if self.espacio_player[b][a]!=1 and self.espacio_player[b][a]!=3:
-                self.espacio_player[b][a]+=1
-                self.pasa=True
-                actualiza_player()
-            else:
-                disparo_enemy()
-
-        def actualiza_enemy():
-            print(self.espacio_enemy)
+        def actualiza_tablero():
+            """
+            Actualiza el tablero del enemigo con la respectiva, nueva casilla disparada
+            """
+            print(self.espacio_enemy,"hols")
             for f in range(len(self.espacio_enemy)):
                 for c in range(len(self.espacio_enemy[0])):
                     if self.espacio_enemy[f][c]==0:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
-                    if self.espacio_enemy[f][c]==2:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
                     if self.espacio_enemy[f][c]==1:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
-                    if self.espacio_enemy[f][c]==3:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
-            if cuentabarcos(self.espacio_enemy)==0:
-                print("WINNER")
-                self.juegoterminado(True)
-            if self.pasa==False:
-                self.root.after(2000,disparo_enemy)
-        actualiza_enemy()
+        actualiza_tablero()
 
         def Disparo(e):
+            """
+            Selecciona la casilla escogida por el usuario para x motivo
+            """
             if self.pasa==True:
                 counter=60
                 def creaA(e):
                     if e.x<counter:
                         a=0
+                        print("boom")
                     elif e.x<counter*2:
                         a=1
                     elif e.x<counter*3:
@@ -290,11 +276,20 @@ class game:
                 b=creaB(e)
                 if self.espacio_enemy[b][a]!=1 and self.espacio_enemy[b][a]!=3:
                     self.espacio_enemy[b][a]+=1
-                    self.pasa=False
-                    actualiza_enemy()
+                    self.pasa=True #era false
+                    actualiza_tablero()
         Click=Thread(target=self.canvas_enemi.bind("<Button-1>",Disparo))
         Click.start()
-
+        def seguirJuego(forma):
+            self.root.destroy()
+            pantalla_juego=Tk()
+            pantalla_juego.title("SHIPSTACK")
+            pantalla_juego.config(cursor="pirate")
+            pantalla_juego.minsize(1200,600)#
+            pantalla_juego.resizable(width=NO,height=NO)
+            partida=game(pantalla_juego,forma,self.cantBarcos)
+            pantalla_juego.mainloop()
+#############################################################################################################
     def pantalla_guard(self):
         self.canvas_enemi = Canvas(self.root,width=600,height=600,bg="red")
         self.canvas_enemi.place(x=0,y=0)

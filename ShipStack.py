@@ -5,6 +5,8 @@ from threading import Thread    #hilos
 import threading                #hilos
 import os                       #carga de imagenes
 from Juego import game
+from tkinter import messagebox
+
 def main_track():
     """
     Esta es la función para ejecutar el sonido con la bibloteca pygame.
@@ -202,6 +204,9 @@ class main_screen:
 
         self.player_name = Entry(self.main_canvas)
         self.player_name.place(x=550,y=155,width=100,height=30)
+
+        self.cantBarcos = Entry(self.main_canvas)
+        self.cantBarcos.place(x=550,y=200,width=100,height=30)
         #Se genera la barra de menu
         self.options_bar = Menu(self.root)
         self.root.config(menu=self.options_bar)
@@ -209,7 +214,7 @@ class main_screen:
         self.abrir_juego = Menu(self.options_bar)
         self.options_bar.add_cascade(label="ABRIR JUEGO", menu=self.abrir_juego)
         self.abrir_juego.add_command(label="Abrir partida guardada",command=lambda:abrirjuego("Guardado"))
-        self.abrir_juego.add_separator()
+        self.abrir_juego.add_separator() 
         #Columna del menu para acceder al salón de la fama
         self.fama_menu = Menu(self.options_bar)
         self.options_bar.add_cascade(label="SALÓN DE LA FAMA", menu=self.fama_menu)
@@ -225,7 +230,7 @@ class main_screen:
         self.help_menu.add_command(label="DETENER MUSICA", command=stop_music)
         self.help_menu.add_command(label="SALIR DEL JUEGO", command=End_game)
                 
-        startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'),command=lambda:abrirjuego("Play"))
+        startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'),command=lambda:abrirjuego("PlayB"))
         startGame.place(x=500,y=500)
 
         def abrir_txt(self,persona,puntaje):#tiene como argumentos el nombre y puntaje del jugador que finalizo partida 
@@ -265,14 +270,22 @@ class main_screen:
             
         def abrirjuego(forma):
             if self.player_name.get() != "":
-                main_menu.destroy()
-                pantalla_juego=Tk()
-                pantalla_juego.title("SHIPSTACK")
-                pantalla_juego.config(cursor="pirate")
-                pantalla_juego.minsize(1300,600)#
-                pantalla_juego.resizable(width=NO,height=NO)
-                partida=game(pantalla_juego,forma)
-                pantalla_juego.mainloop()
+                x=self.cantBarcos.get()
+                if isinstance(int(x),int):
+                        x=int(x)
+                        main_menu.destroy()
+                        stop_music()
+                        pantalla_juego=Tk()
+                        pantalla_juego.title("SHIPSTACK")
+                        pantalla_juego.config(cursor="pirate")
+                        pantalla_juego.minsize(600,600)#
+                        pantalla_juego.resizable(width=NO,height=NO)
+                        partida=game(pantalla_juego,forma,self.cantBarcos)
+                        pantalla_juego.mainloop()
+                else:
+                        messagebox.showinfo("Error","Debe ingresar un numero")
+                """except:
+                    pass"""
             if forma=="Guardado":
                 main_menu.destroy()
                 pantalla_juego=Tk()
