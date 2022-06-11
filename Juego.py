@@ -25,6 +25,7 @@ def cargaimagen(nombre):
     imagen = PhotoImage(file=ruta)
     return imagen
 
+
 class game:
     def __init__(self,root,forma,barcos):
         self.root=root
@@ -49,8 +50,11 @@ class game:
         self.canvas_info.place(x=601,y=0)
         self.segundos=0
         self.min=0
-        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos),width=9,height=2,fg="black",bg="#b4b0f7")
+        self.mar_seg=Label(self.canvas_info,text="Tiempo: "+str(self.min)+":"+str(self.segundos),width=9,height=2,fg="black",bg="#b4b0f7")
         self.mar_seg.place(x=0,y=0)
+        ganar=True
+        """self.botonVolver =Button(self.root, text="VOLVER", command=self.juegoterminado(ganar))
+        self.botonVolver.place(x="200",y="100")"""
         self.espacio_enemy=generabarcos()        
         self.espacio_player=[
         [0,0,0,0,0,0,0,2,0,0],
@@ -131,22 +135,31 @@ class game:
                         boom()
                     elif e.x<counter*2:
                         a=1
+                        boom()
                     elif e.x<counter*3:
                         a=2
+                        boom()
                     elif e.x<counter*4:
                         a=3
+                        boom()
                     elif e.x<counter*5:
                         a=4
+                        boom()
                     elif e.x<counter*6:
                         a=5
+                        boom()
                     elif e.x<counter*7:
                         a=6
+                        boom()
                     elif e.x<counter*8:
                         a=7
+                        boom()
                     elif e.x<counter*9:
                         a=8
+                        boom()
                     elif e.x<counter*10:
                         a=9
+                        boom()
                     return a
                 def creaB(e):
                     if e.y<counter:
