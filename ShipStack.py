@@ -230,7 +230,7 @@ class main_screen:
         self.help_menu.add_command(label="DETENER MUSICA", command=stop_music)
         self.help_menu.add_command(label="SALIR DEL JUEGO", command=End_game)
                 
-        startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'),command=lambda:abrirjuego("Play"))
+        startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'),command=lambda:abrirjuego("PlayB"))
         startGame.place(x=500,y=500)
 
         def abrir_txt(self,persona,puntaje):#tiene como argumentos el nombre y puntaje del jugador que finalizo partida 
@@ -278,12 +278,14 @@ class main_screen:
                         pantalla_juego=Tk()
                         pantalla_juego.title("SHIPSTACK")
                         pantalla_juego.config(cursor="pirate")
-                        pantalla_juego.minsize(1300,600)#
+                        pantalla_juego.minsize(600,600)#
                         pantalla_juego.resizable(width=NO,height=NO)
-                        partida=game(pantalla_juego,forma,self.cantBarcos)
+                        partida=game(pantalla_juego,forma,x,[])
                         pantalla_juego.mainloop()
                 else:
                         messagebox.showinfo("Error","Debe ingresar un numero")
+                """except:
+                    pass"""
             if forma=="Guardado":
                 main_menu.destroy()
                 pantalla_juego=Tk()
