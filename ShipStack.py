@@ -7,18 +7,15 @@ import os                       #carga de imagenes
 from Juego import game
 from tkinter import messagebox
 
-def main_track():
-    """
-    Esta es la función para ejecutar el sonido con la bibloteca pygame.
+
+"""
+    Después de la función para ejecutar el sonido con la bibloteca pygame.
     Primero se inicializa el mixer y se escoge el archivo.
     Luego hay que indicar la cantidad de reproducciones para que ejecute la
     acción.
 
     stop_music es una función utilizada para detener la música
-    """
-    pygame.mixer.init() 
-    pygame.mixer.music.load("ShipStackMaintheme.mp3")
-    pygame.mixer.music.play(loops=0)
+"""
 stop_music = lambda: pygame.mixer.music.stop()
 
 def cargaimagen(nombre):
@@ -193,7 +190,9 @@ class main_screen:
         3. Se implementa la barra de opciones
         4. Se solicita el nombre del usuario y la cantidad de naves a usar con su respectivo tipo
         """
-        main_track()
+        pygame.mixer.init() 
+        pygame.mixer.music.load("ShipStackMaintheme.mp3")
+        pygame.mixer.music.play(loops=0)
 
         self.main_canvas = tk.Canvas(self.root, width=900, height=700, bg="blue")
         self.main_canvas.place(x=0,y=0)
