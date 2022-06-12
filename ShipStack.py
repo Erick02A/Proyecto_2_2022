@@ -232,45 +232,11 @@ class main_screen:
                 
         startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'),command=lambda:abrirjuego("PlayB"))
         startGame.place(x=500,y=500)
-
-        def abrir_txt(self,persona,puntaje):#tiene como argumentos el nombre y puntaje del jugador que finalizo partida 
-            archivo= open("archivo.txt","r") 
-            nombres = archivo.readlines()#guarda los nombres y puntajes en una variable
-            archivo.close() 
-            self.comparador(nombres,"",persona,puntaje,0)#llama a la funcion que compara el puntaje con los del top 7 
     
-        def comparador(self,lista, res , persona,puntaje,i):
-            if i == 7: #contador que verifica que se revise hasta el 7 lugar
-                return self.actualizar(res) 
-            divisor = lista[0].split(";")#separa el nombre del puntaje y los guarda en una lista
-            actualPunt = int(divisor[1])#obtiene el puntaje de la lista y lo convierte en entero
-            if actualPunt < puntaje: #compara si el puntaje obtenido es mayor a uno del top 7          
-                res += persona + ";" + str(puntaje)+ "\n"#guarda el nombre y puntaje del jugador en el string de resultado           
-                #usando el contador +1 se obtiene la posición que consiguió y se muestra en un label junto con el puntaje
-                self.posicion_obt.configure(text="Has obtenido la posición " + str(i+1)+" con un total de " + str(puntaje)+" puntos")
-                return self.comparador(lista,res,persona,0,i+1)#cambia el valor del puntaje a 0 para no reemplazar los demas puntajes menores
-            self.comparador(lista[1:],res+lista[0],persona,puntaje,i+1)#guarda los datos del top 7 cuando el puntaje del jugador no es superior a alguno de estos
-
-        #funcion que obtiene la variable con los datos del nuevo top 7 y actualiza el archivo de texto con estos    
-        def actualizar(self,nuevos):
-            archivo = open("puntajes.txt","w") 
-            archivo.write(nuevos) 
-            archivo.close()
-        #retorna a la pantalla principal y restablece los valores
-        def retorno(self):
-            global puntaje
-            global nombre
-            global segundos
-            puntaje=0 #restablece el puntaje
-            nombre="" #retablese el nombre
-            segundos=0 #restablece los segundos
-            self.main_canvas.destroy()
-            self.pantalla_principal()
-
-            
         def abrirjuego(forma):
             if self.player_name.get() != "":
                 x=self.cantBarcos.get()
+                y=self.player_name.get()
                 if isinstance(int(x),int):
                         x=int(x)
                         main_menu.destroy()
@@ -280,7 +246,7 @@ class main_screen:
                         pantalla_juego.config(cursor="pirate")
                         pantalla_juego.minsize(600,600)#
                         pantalla_juego.resizable(width=NO,height=NO)
-                        partida=game(pantalla_juego,forma,x,[])
+                        partida=game(pantalla_juego,forma,x,[],y)
                         pantalla_juego.mainloop()
                 else:
                         messagebox.showinfo("Error","Debe ingresar un numero")

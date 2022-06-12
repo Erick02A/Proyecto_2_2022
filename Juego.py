@@ -22,10 +22,11 @@ def cargaimagen(nombre):
     return imagen
 
 class game:
-    def __init__(self,root,forma,barcos,tablero):
+    def __init__(self,root,forma,barcos,tablero,nombre):
         self.root=root
         self.barcos=barcos #int()
         self.tablero=tablero
+        self.player_name=nombre
         self.main_canvas = tk.Canvas(root,width=1300,height=600, bg="green") #1600,800
         self.main_canvas.place(x=0,y=0)
         if forma == "PlayB":
@@ -44,6 +45,14 @@ class game:
         self.canvas_player.place(x=701,y=0)
         self.canvas_info=Canvas(self.root,width=100,height=600)
         self.canvas_info.place(x=601,y=0)
+        #Se genera la barra de menu
+        self.options_bar = Menu(self.root)
+        self.root.config(menu=self.options_bar)
+
+        self.abrir_juego = Menu(self.options_bar)
+        self.options_bar.add_cascade(label="Guardar", menu=self.abrir_juego)
+        self.abrir_juego.add_command(label="Guardar Partida",command=lambda:Guardar())
+        self.abrir_juego.add_separator()
         self.segundos=0
         self.min=0
         self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos),width=9,height=2,fg="black",bg="#b4b0f7")
@@ -71,11 +80,11 @@ class game:
                         self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
                     if self.espacio_player[f][c]==3:
                         self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
-            if self.pasa==False:
-                self.root.after(2000,disparo_enemy)
             if cuentabarcos(self.espacio_player)==0:
                 print("LOSER")
                 self.juegoterminado(False)
+            if self.pasa==False:
+                self.root.after(2000,disparo_enemy)
         actualiza_player()
         def disparo_enemy():
             """
@@ -86,10 +95,11 @@ class game:
             b=randint(0,9)
             if self.espacio_player[b][a]==0:
                 self.espacio_player[b][a]+=1
-                actualiza_player()
-            if self.espacio_player[b][a]==2:
-                self.espacio_player[b][a]+=1
                 self.pasa=True
+                actualiza_player()
+            elif self.espacio_player[b][a]==2:
+                self.espacio_player[b][a]+=1
+                self.pasa=False
                 actualiza_player()
             else:
                 disparo_enemy()
@@ -181,6 +191,8 @@ class game:
 
         Click=Thread(target=self.canvas_enemi.bind("<Button-1>",Disparo))
         Click.start()
+        def Guardar():
+            l=1
 #############################################################################################################
     def pantalla_gameB(self):
         self.canvas_player = Canvas(self.root,width=600,height=600,bg="red")
@@ -188,7 +200,7 @@ class game:
         #Se genera la barra de menu
         self.options_bar = Menu(self.root)
         self.root.config(menu=self.options_bar)
-        #Columna del menu para abrir una partida guardada
+        #Columna del menu para seguir el juego
         self.abrir_juego = Menu(self.options_bar)
         self.options_bar.add_cascade(label="Iniciar Partida", menu=self.abrir_juego)
         self.abrir_juego.add_command(label="Iniciar Partida",command=lambda:seguirJuego("Play"))
@@ -287,7 +299,7 @@ class game:
             pantalla_juego.config(cursor="pirate")
             pantalla_juego.minsize(1300,600)#
             pantalla_juego.resizable(width=NO,height=NO)
-            partida=game(pantalla_juego,forma,0,self.espacio_player)
+            partida=game(pantalla_juego,forma,0,self.espacio_player,self.player_name)
             pantalla_juego.mainloop()
 #############################################################################################################
     def pantalla_guard(self):
@@ -500,7 +512,36 @@ class game:
         """
     def juegoterminado(self,ganar):
         if ganar==True:
-            ganar
+            def abrir_txt():#tiene como argumentos el nombre y puntaje del jugador que finalizo partida 
+                archivo= open("puntajes.txt","r") 
+                nombres = archivo.readlines()#guarda los nombres y puntajes en una variable
+                archivo.close() 
+                comparador(nombres,"",0)#llama a la funcion que compara el puntaje con los del top 7 
+    
+            def comparador(lista, res ,i):
+                if i == 10: #contador que verifica que se revise hasta el 7 lugar
+                    return actualizar(res) 
+                divisor = lista[0].split(";")#separa el nombre del puntaje y los guarda en una lista
+                Punt = divisor[1].split(":")#obtiene el puntaje de la lista y lo convierte en entero
+                actualPunt=(int(Punt[0])*100)+int(Punt[1])
+                if actualPunt > (self.min*100+self.segundos): #compara si el puntaje obtenido es mayor a uno del top 7          
+                    res += self.player_name + ";" + str(self.min)+":"+str(self.segundos)+ "\n"#guarda el nombre y puntaje del jugador en el string de resultado           
+                    #usando el contador +1 se obtiene la posición que consiguió y se muestra en un label junto con el puntaje
+                    messagebox.showinfo("Felicidades","Obtuviste la pocicion "+str(i+1)+"\n"+
+                    "Con un tiempo de "+str(self.min)+":"+str(self.segundos))
+                    self.segundos=61
+                    self.min=2000
+                    return comparador(lista,res,i+1)#cambia el valor del puntaje a 0 para no reemplazar los demas puntajes menores
+                comparador(lista[1:],res+lista[0],i+1)#guarda los datos del top 7 cuando el puntaje del jugador no es superior a alguno de estos
+
+            #funcion que obtiene la variable con los datos del nuevo top 7 y actualiza el archivo de texto con estos    
+            def actualizar(nuevos):
+                archivo = open("puntajes.txt","w") 
+                archivo.write(nuevos) 
+                archivo.close()
+            abrir_txt()
+        elif ganar==False:
+            messagebox.showinfo("Manco","Game Over")
         self.root.destroy()
         import ShipStack       
 def cuentabarcos(pant):
