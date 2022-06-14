@@ -237,16 +237,16 @@ class main_screen:
                 x=self.cantBarcos.get()
                 y=self.player_name.get()
                 if isinstance(int(x),int):
-                        x=int(x)
-                        main_menu.destroy()
-                        stop_music()
-                        pantalla_juego=Tk()
-                        pantalla_juego.title("SHIPSTACK")
-                        pantalla_juego.config(cursor="pirate")
-                        pantalla_juego.minsize(600,600)#
-                        pantalla_juego.resizable(width=NO,height=NO)
-                        partida=game(pantalla_juego,forma,x,[],y)
-                        pantalla_juego.mainloop()
+                    x=int(x)
+                    main_menu.destroy()
+                    stop_music()
+                    pantalla_juego=Tk()
+                    pantalla_juego.title("SHIPSTACK")
+                    pantalla_juego.config(cursor="pirate")
+                    pantalla_juego.minsize(600,600)#
+                    pantalla_juego.resizable(width=NO,height=NO)
+                    partida=game(pantalla_juego,forma,x,[],y)
+                    pantalla_juego.mainloop()
                 else:
                         messagebox.showinfo("Error","Debe ingresar un numero")
                 """except:
@@ -258,7 +258,7 @@ class main_screen:
                 pantalla_juego.config(cursor="pirate")
                 pantalla_juego.minsize(1300,600)#
                 pantalla_juego.resizable(width=NO,height=NO)
-                partida=game(pantalla_juego,forma)
+                partida=game(pantalla_juego,forma,0,[],0)
                 pantalla_juego.mainloop()
 
 

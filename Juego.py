@@ -7,6 +7,7 @@ import os
 import time 
 from random import *
 from tkinter import messagebox
+import pickle
 
 def boom():
     pygame.mixer.init() 
@@ -63,12 +64,14 @@ class game:
 
         self.abrir_juego = Menu(self.options_bar)
         self.options_bar.add_cascade(label="Guardar", menu=self.abrir_juego)
-        self.abrir_juego.add_command(label="Guardar Partida",command=lambda:Guardar())
+        self.abrir_juego.add_command(label="Guardar Partida",command=lambda:self.Guardar())
         self.abrir_juego.add_separator()
         self.segundos=0
         self.min=0
-        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos),width=9,height=2,fg="black",bg="#b4b0f7")
+        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos),width=14,height=2,fg="black",bg="#b4b0f7")
         self.mar_seg.place(x=0,y=0)
+        self.name=Label(self.canvas_info,text="Jugador: "+self.player_name,width=14,height=2,fg="black",bg="#b4b0f7")
+        self.name.place(x=0,y=50)
         self.espacio_enemy=generabarcos()
         self.espacio_player=self.tablero
         self.pasa=True
@@ -108,13 +111,13 @@ class game:
             b=randint(0,9)
             if self.espacio_player[b][a]==0:
                 self.espacio_player[b][a]+=1
+                pickSound()
                 self.pasa=True
-                boom()
                 actualiza_player()
             elif self.espacio_player[b][a]==2:
                 self.espacio_player[b][a]+=1
-                self.pasa=False
                 boom()
+                self.pasa=False
                 actualiza_player()
             else:
                 disparo_enemy()
@@ -126,7 +129,7 @@ class game:
                     if self.espacio_enemy[f][c]==0:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
                     if self.espacio_enemy[f][c]==2:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00AAFF")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
                     if self.espacio_enemy[f][c]==1:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
                     if self.espacio_enemy[f][c]==3:
@@ -144,34 +147,24 @@ class game:
                 def creaA(e):
                     if e.x<counter:
                         a=0
-                        boom()
                     elif e.x<counter*2:
                         a=1
-                        boom()
                     elif e.x<counter*3:
                         a=2
-                        boom()
                     elif e.x<counter*4:
                         a=3
-                        boom()
                     elif e.x<counter*5:
                         a=4
-                        boom()
                     elif e.x<counter*6:
                         a=5
-                        boom()
                     elif e.x<counter*7:
                         a=6
-                        boom()
                     elif e.x<counter*8:
                         a=7
-                        boom()
                     elif e.x<counter*9:
                         a=8
-                        boom()
                     elif e.x<counter*10:
                         a=9
-                        boom()
                     return a
                 def creaB(e):
                     if e.y<counter:
@@ -203,6 +196,7 @@ class game:
                 else:
                     if self.espacio_enemy[b][a]==0: #cian
                         self.espacio_enemy[b][a]+=1
+                        pickSound()
                         self.pasa=False #linea para rotar turnos
                         actualiza=Thread(target= actualiza_enemy())
                         actualiza.start()
@@ -210,6 +204,7 @@ class game:
 
                     if self.espacio_enemy[b][a]==2: #azul
                         self.espacio_enemy[b][a]+=1
+                        boom()
                         actualiza=Thread(target= actualiza_enemy())
                         actualiza.start()
                         self.root.after(500, tensionSound)
@@ -218,8 +213,6 @@ class game:
 
         Click=Thread(target=self.canvas_enemi.bind("<Button-1>",Disparo))
         Click.start()
-        def Guardar():
-            l=1
 #############################################################################################################
     def pantalla_gameB(self):
         self.canvas_player = Canvas(self.root,width=600,height=600,bg="red")
@@ -322,14 +315,17 @@ class game:
         Click=Thread(target=self.canvas_player.bind("<Button-1>",Coloca))
         Click.start()
         def seguirJuego(forma):
-            self.root.destroy()
-            pantalla_juego=Tk()
-            pantalla_juego.title("SHIPSTACK")
-            pantalla_juego.config(cursor="pirate")
-            pantalla_juego.minsize(1300,600)#
-            pantalla_juego.resizable(width=NO,height=NO)
-            partida=game(pantalla_juego,forma,0,self.espacio_player,self.player_name)
-            pantalla_juego.mainloop()
+            if cuentabarcos(self.espacio_player)==self.barcos:
+                self.root.destroy()
+                pantalla_juego=Tk()
+                pantalla_juego.title("SHIPSTACK")
+                pantalla_juego.config(cursor="pirate")
+                pantalla_juego.minsize(1300,600)#
+                pantalla_juego.resizable(width=NO,height=NO)
+                partida=game(pantalla_juego,forma,0,self.espacio_player,self.player_name)
+                pantalla_juego.mainloop()
+            else:
+                messagebox.showinfo("Error","No haz ingresado la cantidad de barcos indicada")
 #############################################################################################################
     def pantalla_guard(self):
         self.canvas_enemi = Canvas(self.root,width=600,height=600,bg="red")
@@ -338,23 +334,23 @@ class game:
         self.canvas_player.place(x=701,y=0)
         self.canvas_info=Canvas(self.root,width=100,height=600)
         self.canvas_info.place(x=601,y=0)
-        self.segundos=0
-        self.min=0
-        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos),width=9,height=2,fg="black",bg="#b4b0f7")
+        #Se genera la barra de menu
+        self.options_bar = Menu(self.root)
+        self.root.config(menu=self.options_bar)
+
+        self.abrir_juego = Menu(self.options_bar)
+        self.options_bar.add_cascade(label="Guardar", menu=self.abrir_juego)
+        self.abrir_juego.add_command(label="Guardar Partida",command=lambda:self.Guardar())
+        self.abrir_juego.add_separator()
+        self.segundos=self.sacaguard("seg")
+        self.min=self.sacaguard("min")
+        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos),width=14,height=2,fg="black",bg="#b4b0f7")
         self.mar_seg.place(x=0,y=0)
-        self.espacio_enemy=generabarcos()        
-        self.espacio_player=[
-        [0,0,0,0,0,0,0,2,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,2,0,0,2,0,2],
-        [0,0,0,0,0,0,2,0,0,0],
-        [0,0,2,0,0,0,2,0,0,0],
-        [0,0,2,0,0,0,2,0,0,2],
-        [0,0,2,0,0,0,0,0,2,0],
-        [0,0,2,0,0,0,0,0,0,0],
-        [0,0,2,0,2,0,0,2,0,0],
-        [0,0,2,0,0,0,0,0,0,0]
-        ]
+        self.name=Label(self.canvas_info,text="Jugador: "+self.sacaguard("name"),width=14,height=2,fg="black",bg="#b4b0f7")
+        self.name.place(x=0,y=50)
+        self.espacio_enemy=self.sacaguard("enemy")
+        self.espacio_player=self.sacaguard("player")
+        self.pasa=True
         def Cronometro():
             if self.segundos==60:
                 self.segundos=0
@@ -375,20 +371,35 @@ class game:
                         self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
                     if self.espacio_player[f][c]==3:
                         self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
+            self.root.after(500, tensionSound)
             if cuentabarcos(self.espacio_player)==0:
                 print("LOSER")
-                
+                self.juegoterminado(False)
+            if self.pasa==False:
+                self.root.after(2000,disparo_enemy)
         actualiza_player()
         def disparo_enemy():
+            """
+            disparo_enemy
+            Selecciona un cuadro aleatorio y le dispara desde la posición del computador hacia el tablero del jugador
+            """
             a=randint(0,9)
             b=randint(0,9)
-            if self.espacio_player[b][a]!=1 and self.espacio_player[b][a]!=3:
+            if self.espacio_player[b][a]==0:
                 self.espacio_player[b][a]+=1
+                pickSound()
+                self.pasa=True
+                actualiza_player()
+            elif self.espacio_player[b][a]==2:
+                self.espacio_player[b][a]+=1
+                boom()
+                self.pasa=False
                 actualiza_player()
             else:
                 disparo_enemy()
 
         def actualiza_enemy():
+            print(self.espacio_enemy)
             for f in range(len(self.espacio_enemy)):
                 for c in range(len(self.espacio_enemy[0])):
                     if self.espacio_enemy[f][c]==0:
@@ -401,64 +412,100 @@ class game:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
             if cuentabarcos(self.espacio_enemy)==0:
                 print("WINNER")
-                
-            disparo_enemy()
+                self.juegoterminado(True)
+            if self.pasa==False:
+                self.root.after(2000,disparo_enemy)
         actualiza_enemy()
 
         def Disparo(e):
-            def creaA(e):
-                if e.x<60:
-                    a=0
-                elif e.x<120:
-                    a=1
-                elif e.x<180:
-                    a=2
-                elif e.x<240:
-                    a=3
-                elif e.x<300:
-                    a=4
-                elif e.x<360:
-                    a=5
-                elif e.x<420:
-                    a=6
-                elif e.x<480:
-                    a=7
-                elif e.x<540:
-                    a=8
-                elif e.x<600:
-                    a=9
-                return a
-            def creaB(e):
-                if e.y<60:
-                    a=0
-                elif e.y<120:
-                    a=1
-                elif e.y<180:
-                    a=2
-                elif e.y<240:
-                    a=3
-                elif e.y<300:
-                    a=4
-                elif e.y<360:
-                    a=5
-                elif e.y<420:
-                    a=6
-                elif e.y<480:
-                    a=7
-                elif e.y<540:
-                    a=8
-                elif e.y<600:
-                    a=9
-                return a
-            a=creaA(e)
-            b=creaB(e)
-            if self.espacio_enemy[b][a]!=1 and self.espacio_enemy[b][a]!=3:
-                self.espacio_enemy[b][a]+=1
-                actualiza_enemy()
+            if self.pasa==True:
+                counter=60
+                def creaA(e):
+                    if e.x<counter:
+                        a=0
+                    elif e.x<counter*2:
+                        a=1
+                    elif e.x<counter*3:
+                        a=2
+                    elif e.x<counter*4:
+                        a=3
+                    elif e.x<counter*5:
+                        a=4
+                    elif e.x<counter*6:
+                        a=5
+                    elif e.x<counter*7:
+                        a=6
+                    elif e.x<counter*8:
+                        a=7
+                    elif e.x<counter*9:
+                        a=8
+                    elif e.x<counter*10:
+                        a=9
+                    return a
+                def creaB(e):
+                    if e.y<counter:
+                        a=0
+                    elif e.y<counter*2:
+                        a=1
+                    elif e.y<counter*3:
+                        a=2
+                    elif e.y<counter*4:
+                        a=3
+                    elif e.y<counter*5:
+                        a=4
+                    elif e.y<counter*6:
+                        a=5
+                    elif e.y<counter*7:
+                        a=6
+                    elif e.y<counter*8:
+                        a=7
+                    elif e.y<counter*9:
+                        a=8
+                    elif e.y<counter*10:
+                        a=9
+                    return a
+                a=creaA(e)
+                b=creaB(e)
+                if self.espacio_enemy[b][a]==1 or self.espacio_enemy[b][a]==3 : #disparada
+                    tensionSound()
+                    messagebox.showinfo("Error","Ya disparaste aquí")
+                else:
+                    if self.espacio_enemy[b][a]==0: #cian
+                        self.espacio_enemy[b][a]+=1
+                        pickSound()
+                        self.pasa=False #linea para rotar turnos
+                        actualiza=Thread(target= actualiza_enemy())
+                        actualiza.start()
+                        self.root.after(500, tensionSound)
+
+                    if self.espacio_enemy[b][a]==2: #azul
+                        self.espacio_enemy[b][a]+=1
+                        boom()
+                        actualiza=Thread(target= actualiza_enemy())
+                        actualiza.start()
+                        self.root.after(500, tensionSound)
+            else:
+                messagebox.showinfo("Error","No es tu turno")
+
         Click=Thread(target=self.canvas_enemi.bind("<Button-1>",Disparo))
         Click.start()
-    
-
+    def sacaguard(self,saca):
+        archivo=open("partida.txt","rb")
+        lista=pickle.load(archivo)
+        if saca=="seg":
+            return lista[2]
+        if saca=="name":
+            return lista[3]
+        if saca=="enemy":
+            return lista[0]
+        if saca=="player":
+            return lista[1]
+        if saca=="min":
+            return lista[4]
+    def Guardar(self):
+        archivo=open("partida.txt","wb")
+        pickle.dump([self.espacio_enemy,self.espacio_player,self.segundos,self.player_name,self.min],archivo)
+        archivo.close()
     def juegoterminado(self,ganar):
         if ganar==True:
             def abrir_txt():#tiene como argumentos el nombre y puntaje del jugador que finalizo partida 
@@ -490,7 +537,7 @@ class game:
                 archivo.close()
             abrir_txt()
         elif ganar==False:
-            messagebox.showinfo("Lo sentimos","Usted perdió")
+            messagebox.showinfo("Manco","Perdiste, juegue bien manco")
         self.root.destroy()
         import ShipStack       
 def cuentabarcos(pant):
