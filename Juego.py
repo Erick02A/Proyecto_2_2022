@@ -42,7 +42,6 @@ def cargaimagen(nombre):
     ruta = os.path.join("Imagenes",nombre)
     imagen = PhotoImage(file=ruta)
     return imagen
-
 class game:
     """
     La clase utilizada para el juego
@@ -81,27 +80,35 @@ class game:
         self.root.config(menu=self.options_bar)
 
         self.abrir_juego = Menu(self.options_bar)
-        self.options_bar.add_cascade(label="Guardar", menu=self.abrir_juego)
+        self.options_bar.add_cascade(label="Opciones", menu=self.abrir_juego)
         self.abrir_juego.add_command(label="Guardar Partida",command=lambda:self.Guardar())
+        self.abrir_juego.add_command(label="Salir",command=lambda:salir())
         self.abrir_juego.add_separator()
+        self.aciertos=0
+        self.fallos=0
         self.segundos=0
         self.min=0
-        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos),width=14,height=2,fg="black",bg="#b4b0f7")
+        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos)+" min",width=14,height=2,fg="black",bg="#b4b0f7")
         self.mar_seg.place(x=0,y=0)
         self.name=Label(self.canvas_info,text="Jugador: "+self.player_name,width=14,height=2,fg="black",bg="#b4b0f7")
         self.name.place(x=0,y=50)
+        self.aci=Label(self.canvas_info,text="aciertos: "+str(self.aciertos),width=14,height=2,fg="black",bg="#b4b0f7")
+        self.aci.place(x=0,y=100)
+        self.fal=Label(self.canvas_info,text="fallos: "+str(self.fallos),width=14,height=2,fg="black",bg="#b4b0f7")
+        self.fal.place(x=0,y=150)
         self.espacio_enemy=generabarcos()
         self.espacio_player=self.tablero
         self.pasa=True
+        def salir():
+            self.root.destroy()
+            import ShipStack
+
         def Cronometro():
-            """
-            Función que implementa el cronómetro que aparece durante la partida
-            """
             if self.segundos==60:
                 self.segundos=0
                 self.min+=1
             self.segundos+=1
-            self.mar_seg.config(text="Tiempo: "+str(self.min)+":"+str(self.segundos)+"secs")
+            self.mar_seg.config(text="Tiempo: "+str(self.min)+":"+str(self.segundos)+" min")
             self.root.after(1000,Cronometro)
         Hilo_crono=Thread(target=Cronometro())
         Hilo_crono.start()
@@ -167,8 +174,6 @@ class game:
                     if self.espacio_enemy[f][c]==3:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")#rojo
             if cuentabarcos(self.espacio_enemy)==0:
-                print("WINNER")
-                messagebox.showinfo("Felicidades","Le ganaste al computador")
                 self.juegoterminado(True)
             if self.pasa==False:
                 self.root.after(2000,disparo_enemy)
@@ -240,7 +245,10 @@ class game:
                     messagebox.showinfo("Error","Ya disparaste aquí")
                 else:
                     if self.espacio_enemy[b][a]==0: #cian
+                        messagebox.showinfo("Manco","Fallaste")
                         self.espacio_enemy[b][a]+=1
+                        self.fallos+=1
+                        self.fal.config(text="fallos: "+str(self.fallos))
                         pickSound()
                         self.pasa=False #linea para rotar turnos
                         actualiza=Thread(target= actualiza_enemy())
@@ -248,7 +256,10 @@ class game:
                         self.root.after(500, tensionSound)
 
                     if self.espacio_enemy[b][a]==2: #azul
+                        messagebox.showinfo("Maquina","acertaste a un barco")
                         self.espacio_enemy[b][a]+=1
+                        self.aciertos+=1
+                        self.aci.config(text="aciertos: "+str(self.aciertos))
                         boom()
                         actualiza=Thread(target= actualiza_enemy())
                         actualiza.start()
@@ -271,8 +282,9 @@ class game:
         self.root.config(menu=self.options_bar)
         #Columna del menu para seguir el juego
         self.abrir_juego = Menu(self.options_bar)
-        self.options_bar.add_cascade(label="Iniciar Partida", menu=self.abrir_juego)
+        self.options_bar.add_cascade(label="Opciones", menu=self.abrir_juego)
         self.abrir_juego.add_command(label="Iniciar Partida",command=lambda:seguirJuego("Play"))
+        self.abrir_juego.add_command(label="Salir",command=lambda:salir())
         self.abrir_juego.add_separator()
         self.contador=0
         self.espacio_player=[
@@ -288,6 +300,9 @@ class game:
         [0,0,0,0,0,0,0,0,0,0]
         ]   
         self.pasa=True #el turno es nuestro
+        def salir():
+            self.root.destroy()
+            import ShipStack
         def actualiza_tablero():
             """
             Actualiza el tablero del enemigo con la respectiva, nueva casilla disparada
@@ -399,32 +414,38 @@ class game:
         #Se genera la barra de menu
         self.options_bar = Menu(self.root)
         self.root.config(menu=self.options_bar)
-
         self.abrir_juego = Menu(self.options_bar)
-        self.options_bar.add_cascade(label="Guardar", menu=self.abrir_juego)
+        self.options_bar.add_cascade(label="Opciones", menu=self.abrir_juego)
         self.abrir_juego.add_command(label="Guardar Partida",command=lambda:self.Guardar())
+        self.abrir_juego.add_command(label="Salir",command=lambda:salir())
         self.abrir_juego.add_separator()
         self.segundos=self.sacaguard("seg")
         self.min=self.sacaguard("min")
-        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos),width=14,height=2,fg="black",bg="#b4b0f7")
+        self.aciertos=self.sacaguard("aci")
+        self.fallos=self.sacaguard("fal")
+        self.mar_seg=Label(self.canvas_info,text="Tiempo. "+str(self.min)+":"+str(self.segundos)+" min",width=14,height=2,fg="black",bg="#b4b0f7")
         self.mar_seg.place(x=0,y=0)
         self.name=Label(self.canvas_info,text="Jugador: "+self.sacaguard("name"),width=14,height=2,fg="black",bg="#b4b0f7")
         self.name.place(x=0,y=50)
+        self.aci=Label(self.canvas_info,text="aciertos: "+str(self.aciertos),width=14,height=2,fg="black",bg="#b4b0f7")
+        self.aci.place(x=0,y=100)
+        self.fal=Label(self.canvas_info,text="fallos: "+str(self.fallos),width=14,height=2,fg="black",bg="#b4b0f7")
+        self.fal.place(x=0,y=150)
         self.espacio_enemy=self.sacaguard("enemy")
         self.espacio_player=self.sacaguard("player")
         self.pasa=True
+        def salir():
+            self.root.destroy()
+            import ShipStack
         def Cronometro():
-            """
-            Función que implementa el cronómetro que aparece durante la partida
-            """
             if self.segundos==60:
                 self.segundos=0
                 self.min+=1
             self.segundos+=1
-            self.mar_seg.config(text="Tiempo: "+str(self.min)+":"+str(self.segundos)+"secs")
+            self.mar_seg.config(text="Tiempo: "+str(self.min)+":"+str(self.segundos)+" min")
             self.root.after(1000,Cronometro)
-        Hilo_crono=Thread(target=Cronometro())
-        Hilo_crono.start()
+        Hilo1_crono=Thread(target=Cronometro())
+        Hilo1_crono.start()
         def actualiza_player():
             """
             Función que verifica qué color asignarle al espacio elegido por el jugador
@@ -487,7 +508,6 @@ class game:
                         self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")#rojo
             if cuentabarcos(self.espacio_enemy)==0:
                 print("WINNER")
-                messagebox.showinfo("Felicidades","Le ganaste al computador")
                 self.juegoterminado(True)
             if self.pasa==False:
                 self.root.after(2000,disparo_enemy)
@@ -559,7 +579,10 @@ class game:
                     messagebox.showinfo("Error","Ya disparaste aquí")
                 else:
                     if self.espacio_enemy[b][a]==0: #cian
+                        messagebox.showinfo("Manco","Fallaste")
                         self.espacio_enemy[b][a]+=1
+                        self.fallos+=1
+                        self.fal.config(text="fallos: "+str(self.fallos))
                         pickSound()
                         self.pasa=False #linea para rotar turnos
                         actualiza=Thread(target= actualiza_enemy())
@@ -567,7 +590,10 @@ class game:
                         self.root.after(500, tensionSound)
 
                     if self.espacio_enemy[b][a]==2: #azul
+                        messagebox.showinfo("Maquina","acertaste a un barco")
                         self.espacio_enemy[b][a]+=1
+                        self.aciertos+=1
+                        self.aci.config(text="aciertos: "+str(self.aciertos))
                         boom()
                         actualiza=Thread(target= actualiza_enemy())
                         actualiza.start()
@@ -593,12 +619,17 @@ class game:
             return lista[1]
         if saca=="min":
             return lista[4]
+        if saca=="aci":
+            return lista[5]
+        if saca=="fal":
+            return lista[6]
+        
     def Guardar(self):
         """
         En caso de que el usuario decida seguir jugando después, esta función se encarga de guardar la partida
         """
         archivo=open("partida.txt","wb")
-        pickle.dump([self.espacio_enemy,self.espacio_player,self.segundos,self.player_name,self.min],archivo)
+        pickle.dump([self.espacio_enemy,self.espacio_player,self.segundos,self.player_name,self.min,self.aciertos,self.fallos],archivo)
         archivo.close()
     def juegoterminado(self,ganar):
         """
@@ -607,6 +638,7 @@ class game:
         Esto con el fin de verificar si la puntación debe ser incluída en el top 10.
         """
         if ganar==True:
+            messagebox.showinfo("Felicidades","Le ganaste al computador")
             def abrir_txt():#tiene como argumentos el nombre y puntaje del jugador que finalizo partida 
                 archivo= open("puntajes.txt","r") 
                 nombres = archivo.readlines()#guarda los nombres y puntajes en una variable
