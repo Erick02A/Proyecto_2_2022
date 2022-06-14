@@ -10,21 +10,30 @@ from tkinter import messagebox
 import pickle
 
 def boom():
+    """
+    Función que implementa el sonido de colisión
+    """
     pygame.mixer.init() 
     pygame.mixer.music.load("boom.wav")
     pygame.mixer.music.play(loops=0)
 def pickSound():
+    """
+    Función que implementa el sonido de elección
+    """
     pygame.mixer.init() 
     pygame.mixer.music.load("coin_falling.mp3")
     pygame.mixer.music.play(loops=0)
 def tensionSound():
+    """
+    Función que implementa la musica de fondo
+    """
     pygame.mixer.init() 
     pygame.mixer.music.load("tension.mpeg")
     pygame.mixer.music.play(-1)
     
 def cargaimagen(nombre):
     """
-    Funcion que cargas las imagenes usadas en el programa
+    Funcion que carga las imagenes usadas en el programa
     Parametros: 
         Nombre: Nombre de la imagen en str
     return:
@@ -35,7 +44,13 @@ def cargaimagen(nombre):
     return imagen
 
 class game:
+    """
+    La clase utilizada para el juego
+    """
     def __init__(self,root,forma,barcos,tablero,nombre):
+        """
+        Se declaran muchos de los atributos más importantes de todo el juego
+        """
         self.root=root
         self.barcos=barcos #int()
         self.tablero=tablero
@@ -51,7 +66,10 @@ class game:
         if forma == "Joistick":
             self.pantalla_joistick()
         
-    def pantalla_game(self):   
+    def pantalla_game(self):
+        """
+        Este método desarrolla la pantalla del juego
+        """
         self.canvas_enemi = Canvas(self.root,width=600,height=600,bg="red")
         self.canvas_enemi.place(x=0,y=0)
         self.canvas_player = Canvas(self.root,width=600,height=600,bg="blue")
@@ -76,25 +94,33 @@ class game:
         self.espacio_player=self.tablero
         self.pasa=True
         def Cronometro():
+            """
+            Función que implementa el cronómetro que aparece durante la partida
+            """
             if self.segundos==60:
                 self.segundos=0
                 self.min+=1
             self.segundos+=1
-            self.mar_seg.config(text="Tiempo. "+str(self.min)+":"+str(self.segundos))
+            self.mar_seg.config(text="Tiempo: "+str(self.min)+":"+str(self.segundos)+"secs")
             self.root.after(1000,Cronometro)
         Hilo_crono=Thread(target=Cronometro())
         Hilo_crono.start()
         def actualiza_player():
+            """
+            Función que verifica qué color asignarle al espacio elegido por el jugador
+            También verifica si el juego ya acaba en base a la situación
+            En palabras simples, actualiza la posicion del jugador
+            """
             for f in range(len(self.espacio_player)):
                 for c in range(len(self.espacio_player[0])):
                     if self.espacio_player[f][c]==0:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")#cian
                     if self.espacio_player[f][c]==2:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#0000FF")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#0000FF")#azul
                     if self.espacio_player[f][c]==1:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")#gris
                     if self.espacio_player[f][c]==3:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")#rojo
             self.root.after(500, tensionSound)
             if cuentabarcos(self.espacio_player)==0:
                 print("LOSER")
@@ -105,7 +131,8 @@ class game:
         def disparo_enemy():
             """
             disparo_enemy
-            Selecciona un cuadro aleatorio y le dispara desde la posición del computador hacia el tablero del jugador
+            Selecciona un cuadro aleatorio y le dispara desde el punto de vista del computador hacia el tablero del jugador.
+            Modifica la variable booleana para asignarle el turno al otro jugador.
             """
             a=randint(0,9)
             b=randint(0,9)
@@ -123,28 +150,43 @@ class game:
                 disparo_enemy()
 
         def actualiza_enemy():
+            """
+            Función que verifica qué color asignarle al espacio elegido por el jugador
+            También verifica si hay ganador en base a la situación
+            En palabras simples, actualiza la posicion del enemigo
+            """
             print(self.espacio_enemy)
             for f in range(len(self.espacio_enemy)):
                 for c in range(len(self.espacio_enemy[0])):
                     if self.espacio_enemy[f][c]==0:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")#cian
                     if self.espacio_enemy[f][c]==2:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00AAFF")#celeste
                     if self.espacio_enemy[f][c]==1:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")#gris
                     if self.espacio_enemy[f][c]==3:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")#rojo
             if cuentabarcos(self.espacio_enemy)==0:
                 print("WINNER")
+                messagebox.showinfo("Felicidades","Le ganaste al computador")
                 self.juegoterminado(True)
             if self.pasa==False:
                 self.root.after(2000,disparo_enemy)
         actualiza_enemy()
 
         def Disparo(e):
+            """
+            Función que se encarga de conectar las acciones del usuario con la situación en la interfaz
+            Basado en la bandera booleana, le asigna un espacio en matriz al click del usuario
+            También se encarga de las validaciones que robustecen al juego, tales como si no es el turno del
+            usuario pero este quiere elegir un espacio o bien si está eligiendo un mismo espacio más de una vez.
+            """
             if self.pasa==True:
                 counter=60
                 def creaA(e):
+                    """
+                    Verifica las posiciones en el eje x
+                    """
                     if e.x<counter:
                         a=0
                     elif e.x<counter*2:
@@ -167,6 +209,9 @@ class game:
                         a=9
                     return a
                 def creaB(e):
+                    """
+                    Verifica las posiciones en el eje y
+                    """
                     if e.y<counter:
                         a=0
                     elif e.y<counter*2:
@@ -215,6 +260,10 @@ class game:
         Click.start()
 #############################################################################################################
     def pantalla_gameB(self):
+        """
+        Función que se encarga de la pantalla previa al juego.
+        Aquí, el usuario encuentra una tabla sin naves y puede colocarlas a su gusto.
+        """
         self.canvas_player = Canvas(self.root,width=600,height=600,bg="red")
         self.canvas_player.place(x=0,y=0)
         #Se genera la barra de menu
@@ -247,18 +296,21 @@ class game:
             for f in range(len(self.espacio_player)):
                 for c in range(len(self.espacio_player[0])):
                     if self.espacio_player[f][c]==0:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")#cian
                     if self.espacio_player[f][c]==2:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#0000FF")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#0000FF")#azul
         actualiza_tablero()
 
         def Coloca(e):
             """
-            Selecciona la casilla escogida por el usuario para x motivo
+            Selecciona la casilla escogida por el usuario 
             """
             if self.pasa==True:
                 counter=60
                 def creaA(e):
+                    """
+                    Verifica las posiciones en el eje x
+                    """
                     if e.x<counter:
                         a=0
                     elif e.x<counter*2:
@@ -281,6 +333,9 @@ class game:
                         a=9
                     return a
                 def creaB(e):
+                    """
+                    Verifica las posiciones en el eje y
+                    """
                     if e.y<counter:
                         a=0
                     elif e.y<counter*2:
@@ -315,6 +370,9 @@ class game:
         Click=Thread(target=self.canvas_player.bind("<Button-1>",Coloca))
         Click.start()
         def seguirJuego(forma):
+            """
+            Una vez terminada la partida, esta función se encarga de redireccionar al usuario al menú principal
+            """
             if cuentabarcos(self.espacio_player)==self.barcos:
                 self.root.destroy()
                 pantalla_juego=Tk()
@@ -328,6 +386,10 @@ class game:
                 messagebox.showinfo("Error","No haz ingresado la cantidad de barcos indicada")
 #############################################################################################################
     def pantalla_guard(self):
+        """
+        Función usada en caso de abrir una partida guardada en sus primeras líneas de código es una recreación de
+        la pantalla del juego tal cual
+        """
         self.canvas_enemi = Canvas(self.root,width=600,height=600,bg="red")
         self.canvas_enemi.place(x=0,y=0)
         self.canvas_player = Canvas(self.root,width=600,height=600,bg="blue")
@@ -352,25 +414,33 @@ class game:
         self.espacio_player=self.sacaguard("player")
         self.pasa=True
         def Cronometro():
+            """
+            Función que implementa el cronómetro que aparece durante la partida
+            """
             if self.segundos==60:
                 self.segundos=0
                 self.min+=1
             self.segundos+=1
-            self.mar_seg.config(text="Tiempo. "+str(self.min)+":"+str(self.segundos))
+            self.mar_seg.config(text="Tiempo: "+str(self.min)+":"+str(self.segundos)+"secs")
             self.root.after(1000,Cronometro)
         Hilo_crono=Thread(target=Cronometro())
         Hilo_crono.start()
         def actualiza_player():
+            """
+            Función que verifica qué color asignarle al espacio elegido por el jugador
+            También verifica si el juego ya acaba en base a la situación
+            En palabras simples, actualiza la posicion del jugador
+            """
             for f in range(len(self.espacio_player)):
                 for c in range(len(self.espacio_player[0])):
                     if self.espacio_player[f][c]==0:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")#cian
                     if self.espacio_player[f][c]==2:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#0000FF")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#0000FF")#axul
                     if self.espacio_player[f][c]==1:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")#gris
                     if self.espacio_player[f][c]==3:
-                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
+                        self.fondo=self.canvas_player.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")#rojo
             self.root.after(500, tensionSound)
             if cuentabarcos(self.espacio_player)==0:
                 print("LOSER")
@@ -399,28 +469,43 @@ class game:
                 disparo_enemy()
 
         def actualiza_enemy():
+            """
+            Función que verifica qué color asignarle al espacio elegido por el jugador
+            También verifica si hay ganador en base a la situación
+            En palabras simples, actualiza la posicion del enemigo
+            """
             print(self.espacio_enemy)
             for f in range(len(self.espacio_enemy)):
                 for c in range(len(self.espacio_enemy[0])):
                     if self.espacio_enemy[f][c]==0:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")#cian
                     if self.espacio_enemy[f][c]==2:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00FFFF")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#00AAFF")#celeste
                     if self.espacio_enemy[f][c]==1:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#555555")#gris
                     if self.espacio_enemy[f][c]==3:
-                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")
+                        self.fondo=self.canvas_enemi.create_rectangle(60*c,60+(60*f),60+(60*c),60*f,fill="#FF0000")#rojo
             if cuentabarcos(self.espacio_enemy)==0:
                 print("WINNER")
+                messagebox.showinfo("Felicidades","Le ganaste al computador")
                 self.juegoterminado(True)
             if self.pasa==False:
                 self.root.after(2000,disparo_enemy)
         actualiza_enemy()
 
         def Disparo(e):
+            """
+            Función que se encarga de conectar las acciones del usuario con la situación en la interfaz
+            Basado en la bandera booleana, le asigna un espacio en matriz al click del usuario
+            También se encarga de las validaciones que robustecen al juego, tales como si no es el turno del
+            usuario pero este quiere elegir un espacio o bien si está eligiendo un mismo espacio más de una vez.
+            """
             if self.pasa==True:
                 counter=60
                 def creaA(e):
+                    """
+                    Verifica las posiciones en el eje x
+                    """
                     if e.x<counter:
                         a=0
                     elif e.x<counter*2:
@@ -443,6 +528,9 @@ class game:
                         a=9
                     return a
                 def creaB(e):
+                    """
+                    Verifica las posiciones en el eje y
+                    """
                     if e.y<counter:
                         a=0
                     elif e.y<counter*2:
@@ -490,6 +578,9 @@ class game:
         Click=Thread(target=self.canvas_enemi.bind("<Button-1>",Disparo))
         Click.start()
     def sacaguard(self,saca):
+        """
+        En caso de que el usuario decida que quiere seguir jugando, esta función se encarga de devolver los datos
+        """
         archivo=open("partida.txt","rb")
         lista=pickle.load(archivo)
         if saca=="seg":
@@ -503,10 +594,18 @@ class game:
         if saca=="min":
             return lista[4]
     def Guardar(self):
+        """
+        En caso de que el usuario decida seguir jugando después, esta función se encarga de guardar la partida
+        """
         archivo=open("partida.txt","wb")
         pickle.dump([self.espacio_enemy,self.espacio_player,self.segundos,self.player_name,self.min],archivo)
         archivo.close()
     def juegoterminado(self,ganar):
+        """
+        Al finalizar el juego
+        La siguiente función se encarga de evaluar los datos.
+        Esto con el fin de verificar si la puntación debe ser incluída en el top 10.
+        """
         if ganar==True:
             def abrir_txt():#tiene como argumentos el nombre y puntaje del jugador que finalizo partida 
                 archivo= open("puntajes.txt","r") 
@@ -515,7 +614,10 @@ class game:
                 comparador(nombres,"",0)#llama a la funcion que compara el puntaje con los del top 7 
     
             def comparador(lista, res ,i):
-                if i == 10: #contador que verifica que se revise hasta el 7 lugar
+                """
+                Es la función encargada de monitorear que solo los mejores 10 tiempos estén en el top 10
+                """
+                if i == 10: #contador que verifica que se revise hasta el lugar 10 
                     return actualizar(res) 
                 divisor = lista[0].split(";")#separa el nombre del puntaje y los guarda en una lista
                 Punt = divisor[1].split(":")#obtiene el puntaje de la lista y lo convierte en entero
@@ -532,6 +634,9 @@ class game:
 
             #funcion que obtiene la variable con los datos del nuevo top 7 y actualiza el archivo de texto con estos    
             def actualizar(nuevos):
+                """
+                Se encarga de actualizar los nuevos puntajes registrados en el sistema
+                """
                 archivo = open("puntajes.txt","w") 
                 archivo.write(nuevos) 
                 archivo.close()
@@ -541,6 +646,9 @@ class game:
         self.root.destroy()
         import ShipStack       
 def cuentabarcos(pant):
+    """
+    Cuenta la cantidad de barcos, si esta es 0, otras funciones se encargarán de dar por terminada la partida
+    """
     cant=0
     for filas in pant:
         for lugar in filas:
@@ -548,6 +656,9 @@ def cuentabarcos(pant):
                 cant+=1
     return cant
 def generabarcos():
+    """
+    Funcion encargada de generar los barcos para el tablero enemigo
+    """
     pant=[
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],

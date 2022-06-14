@@ -51,9 +51,25 @@ class main_screen:
         self.canvas.place(x=0, y=0)
         self.imagen=cargaimagen("bg.png")
         self.canvas.create_image(550,350, image=self.imagen)
-
-        self.texto = Label(self.canvas, text="CÓMO JUGAR:\n*Por definirse*", font=("Times New Roman", 15),fg="#000000",bg="#04faee")
-        self.texto.place(x=300,y=15)
+        medida=15
+        self.texto1 = Label(self.canvas, text="CÓMO JUGAR:", font=("Times New Roman", 15),fg="#000000",bg="#04faee")
+        self.texto1.place(x=300,y=medida)
+        self.texto2 = Label(self.canvas, text="Primero, configura tu nombre y cantidad de naves.\n",
+                           font=("Times New Roman", 15),fg="#000000",bg="#04faee")
+        self.texto2.place(x=100,y=medida+50)
+        self.texto3 = Label(self.canvas, text="Coloca las naves según tu estrategia e inicia la partida.",
+                           font=("Times New Roman", 15),fg="#000000",bg="#04faee")
+        self.texto3.place(x=100,y=medida+100)
+        self.texto4 = Label(self.canvas, text="Deberás elegir una casilla del tablero del computador para advinar donde están sus naves.",
+                           font=("Times New Roman", 15),fg="#000000",bg="#04faee")
+        self.texto4.place(x=100,y=medida+150)
+        self.texto5 = Label(self.canvas, text= "Si aciertas, tienes un turno extra, sino no.",
+                           font=("Times New Roman", 15),fg="#000000",bg="#04faee")
+        self.texto5.place(x=100,y=medida+200)
+        self.texto6 = Label(self.canvas, text="Gana quien adivine primero todas las naves del oponente.",
+                           font=("Times New Roman", 15),fg="#000000",bg="#04faee")
+        self.texto6.place(x=100,y=medida+250)
+        
         #Botón para volver de la seccion instrucciones al menú
         self.Boton_instruccionesToMain = Button(self.canvas, text="VOLVER",font=("Times New Roman", 15),bg="#04faee",command=self.pantalla_principal)
         self.Boton_instruccionesToMain.place(x=350,y=520, width=80, height=30)
@@ -67,8 +83,10 @@ class main_screen:
         self.imagen=cargaimagen("bg.png")
         self.canvas.create_image(550,350, image=self.imagen)
 
-        self.texto = Label(self.canvas, text="¿CÓMO INGRESAR AL TOP 10?:\n*Juegue bien xd*", font=("Times New Roman", 15),fg="#000000",bg="#04faee")
+        self.texto = Label(self.canvas, text="¿CÓMO INGRESAR AL TOP 10?:", font=("Times New Roman", 15),fg="#000000",bg="#04faee")
         self.texto.place(x=300,y=15)
+        self.texto = Label(self.canvas, text="Debes ganar el juego en menos tiempo que los demás jugadores del top.", font=("Times New Roman", 15),fg="#000000",bg="#04faee")
+        self.texto.place(x=200,y=70)
         #Botón para volver de la seccion  al menú
         self.Boton_requisitosToMain = Button(self.canvas, text="VOLVER",font=("Times New Roman", 15),bg="#04faee",command=self.pantalla_principal)
         self.Boton_requisitosToMain.place(x=350,y=520, width=80, height=30)
@@ -132,7 +150,7 @@ class main_screen:
         #funcion que habre el archivo de puntajes y los guarda en una variable
         def abrir_puntajes(): 
             """
-            funcion que habre el archivo de puntajes y los guarda en una variable
+            funcion que abre el archivo de puntajes y los guarda en una variable
             Parametros: 
                 Ninguno
             return:
@@ -147,7 +165,7 @@ class main_screen:
         top10.start()
         def separar(lista,nombre,puntos):
             """
-            funcion que separa los nobres de los puntos
+            funcion que separa los nombres de los puntos
             Parametros: 
                 lista: variable con los nobres y sus puntajes
                 nombre: variable que guarda los nombre
@@ -185,7 +203,7 @@ class main_screen:
     def pantalla_principal(self):
         """
         Aqui dentro van todos los widgets de la pantalla principal.
-        1. Se llama a la función de la música
+        1. Se inicia la musica
         2. Se agrega el fondo de pantalla
         3. Se implementa la barra de opciones
         4. Se solicita el nombre del usuario y la cantidad de naves a usar con su respectivo tipo
@@ -194,18 +212,32 @@ class main_screen:
         pygame.mixer.music.load("ShipStackMaintheme.mp3")
         pygame.mixer.music.play(loops=0)
 
-        self.main_canvas = tk.Canvas(self.root, width=900, height=700, bg="blue")
+        self.main_canvas = tk.Canvas(self.root, width=1200, height=700, bg="blue")
         self.main_canvas.place(x=0,y=0)
         self.main_bg = cargaimagen("bg(1).png")
-        self.main_canvas.create_image(1,1,image=self.main_bg)
-        self.titulo = Label(self.main_canvas, text="SHIPSTACK", font=("Helvetica", 12), fg="#000000", bg="#04faee")
-        self.titulo.place(x=510,y=30,width=180, height=130)
+        self.main_canvas.create_image(500,500,image=self.main_bg)
+        self.BG = Label(self.main_canvas, text="", font=("Helvetica", 12), fg="#000000", bg="#04faee")
+        self.BG.place(x=510,y=30,width=200, height=400)
 
+        self.TypeName = Label(self.main_canvas, text="SHIPSTACK", font=("Algerian", 17), fg="#000000", bg="#04faee")
+        self.TypeName.place(x=510,y=30,width=200, height=100)
+
+        self.TypeName = Label(self.main_canvas, text="TU NOMBRE", font=("Helvetica", 12), fg="#000000", bg="#89cff0")
+        self.TypeName.place(x=510,y=120,width=200, height=30)
+        
         self.player_name = Entry(self.main_canvas)
         self.player_name.place(x=550,y=155,width=100,height=30)
 
+        self.TypeNum = Label(self.main_canvas, text="CANTIDAD DE BARCOS:", font=("Helvetica", 12), fg="#000000", bg="#89cff0")
+        self.TypeNum.place(x=510,y=185,width=200, height=30)
+
+
         self.cantBarcos = Entry(self.main_canvas)
-        self.cantBarcos.place(x=550,y=200,width=100,height=30)
+        self.cantBarcos.place(x=550,y=215,width=100,height=30)
+        
+        startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#89cff0', font=('calibre',10, 'bold'),command=lambda:abrirjuego("PlayB"))
+        startGame.place(x=480,y=345)
+        
         #Se genera la barra de menu
         self.options_bar = Menu(self.root)
         self.root.config(menu=self.options_bar)
@@ -229,10 +261,10 @@ class main_screen:
         self.help_menu.add_command(label="DETENER MUSICA", command=stop_music)
         self.help_menu.add_command(label="SALIR DEL JUEGO", command=End_game)
                 
-        startGame = Button(main_menu, text="   JUGAR    ",width=30, height= 5, bg='#E00707', font=('calibre',10, 'bold'),command=lambda:abrirjuego("PlayB"))
-        startGame.place(x=500,y=500)
-    
         def abrirjuego(forma):
+            """
+            Esta función se encarga de iniciar con las partidas, ya sea una nueva o una guardada.
+            """
             if self.player_name.get() != "":
                 x=self.cantBarcos.get()
                 y=self.player_name.get()
@@ -248,9 +280,8 @@ class main_screen:
                     partida=game(pantalla_juego,forma,x,[],y)
                     pantalla_juego.mainloop()
                 else:
-                        messagebox.showinfo("Error","Debe ingresar un numero")
-                """except:
-                    pass"""
+                    messagebox.showinfo("Error","Debe ingresar un numero")
+
             if forma=="Guardado":
                 main_menu.destroy()
                 pantalla_juego=Tk()
